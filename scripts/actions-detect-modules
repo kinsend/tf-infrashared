@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ -z GITHUB_OUTPUT ]]; then
+  # only for local dev.
+  GITHUB_OUTPUT=/dev/fd/0
+fi
+
 set -o errexit
 set -o pipefail
 set -o nounset
@@ -40,6 +45,8 @@ if [[ "${#pruned_changed_paths[@]}" -eq 0 ]]; then
 	echo "status=empty" >> $GITHUB_OUTPUT
 	log WARN "no modules have been changed, nothing to do"
 else
-	echo "module_path_matrix=$(printf '%s\n' "${pruned_changed_paths[@]}" | jq -jcnR '{module_path:[inputs]}')" >> $GITHUB_OUTPUT
+  module_path_matrix="module_path_matrix=$(printf '%s\n' "${pruned_changed_paths[@]}" | jq -jcnR '{module_path:[inputs]}')"
+	echo $module_path_matrix >> $GITHUB_OUTPUT
 	echo "status=ok" >> $GITHUB_OUTPUT
+	log INFO "$module_path_matrix"
 fi

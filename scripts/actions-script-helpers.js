@@ -78,16 +78,28 @@ ${outcome === "failure" ? stderr : stdout}
  *
  */
 async function matrixJobMarkdownLink(github, context, modulePath) {
-  const job = (
-    await github.rest.actions.listJobsForWorkflowRun({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      run_id: context.runId,
-    })
-  ).data.jobs.find((job) => {
-    return job.name === `${context.job} (${modulePath})`;
+  console.log(`Module path: ${modulePath}`);
+  console.log("Jobs:");
+  const jobs = await github.rest.actions.listJobsForWorkflowRun({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    run_id: context.runId,
   });
-  return `[${modulePath}](${job.html_url}?check_suite_focus=true)`;
+  //console.log(jobs);
+  //console.log(jobs?.data?.jobs);
+
+  const filterByJobName =  `${context.job} (${modulePath})`;
+  const job = jobs.data.jobs.find((j) => {
+    const matches = j.name == filterByJobName; // weaken type check on purpose!
+    const matchesString = matches ? "matches" : "does not match";
+    console.log(`Found job: ${j.name}, ${matchesString} filter: ${filterByJobName}`);
+    return matches;
+  });
+
+  console.log("Matching job details:");
+  console.log(job)
+
+  return `[${modulePath}](${job?.html_url}?check_suite_focus=true)`;
 }
 
 module.exports = {

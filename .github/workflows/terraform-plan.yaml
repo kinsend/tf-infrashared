@@ -39,6 +39,16 @@ jobs:
       TF_VAR_aws_profile: kinsend-infra
       TF_LOG: error
 
+    # This permission is required to allow writing comments and reporting check status.
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+      issues: write
+      pull-requests: write
+      repository-projects: read
+      statuses: write
+
     steps:
 
       - uses: actions/checkout@v3
@@ -107,7 +117,7 @@ jobs:
           #   new - Create a new cost estimate comment on every push.
           infracost comment github --path infracost.json \
                                    --repo $GITHUB_REPOSITORY \
-                                   --github-token ${{ secrets.KS_DEVOPS_BOT_TOKEN }} \
+                                   --github-token ${{ secrets.GITHUB_TOKEN }} \
                                    --pull-request ${{github.event.pull_request.number}} \
                                    --behavior update
 
@@ -126,13 +136,14 @@ jobs:
           STEP_PLAN_STDERR: ${{ steps.plan.outputs.stderr }}
           STEP_PLAN_STDOUT: ${{ steps.plan.outputs.stdout }}
         with:
-          github-token: ${{ secrets.KS_DEVOPS_BOT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const helpers = require('./scripts/actions-script-helpers.js');
         
             helpers.commentResults(
               github,
               context,
+              context.issue.number,
               '${{ matrix.module_path }}',
               [
                 {name: "init"},
