@@ -1,0 +1,14 @@
+# terraform
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+.terraform/
+.terraform_plugin_cache/
+terraform.d/
+*.lock.hcl
+tf.plan
+
+# temporary files from scripts/
+.aws_config
+.idea
+__pycache__/

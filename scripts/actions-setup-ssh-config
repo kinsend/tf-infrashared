@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# This script is used to setup SSH configuration used to clone other required
+# repositories. It expects to find the private SSH key in the SSH_KEY
+# environment variable and setups a local config (to the root of the checked out
+# repository). It then sets GIT_SSH_COMMAND to override it with the necessary
+# flags.
+
+source "$(dirname "${0}")/common"
+
+require ssh-keyscan
+
+ensure_invoked_from_repo
+ensure_invoked_in_github_actions
+
+repo_root_path="$(git rev-parse --show-toplevel)"
+ssh_config_path="${repo_root_path}/.ssh"
+ssh_key_path="${ssh_config_path}/key"
+ssh_known_hosts_path="${ssh_config_path}/known_hosts"
+
+rm -rf "${ssh_config_path}"
+mkdir -p "${ssh_config_path}"
+chmod 500 "${ssh_config_path}"
+echo "${SSH_KEY}" > "${ssh_key_path}"
+chmod 400 "${ssh_key_path}"
+ssh-keyscan "github.com" > "${ssh_known_hosts_path}"
+chmod 400 "${ssh_known_hosts_path}"
+
+echo "GIT_SSH_COMMAND=ssh -q -F none -o IdentitiesOnly=yes -o IdentityFile=${ssh_key_path} -o UserKnownHostsFile=${ssh_known_hosts_path}" >> "${GITHUB_ENV}"

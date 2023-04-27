@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# This script is used to find the path of the modules that have been changed. It
+# is designed to be invoked as a Github Action workflow step that is triggered
+# by a pull request event and will set the following outputs:
+#   - module_path_matrix: path to the changed modules (relative to the
+#     repository root path) in json, to be used as a matrix in dependent jobs
+#   - status: ok or empty
+# The first output is not set when status is "empty" which means that no modules
+# have been changes in this pull request. Otherwise, the status is "ok".
+
+source "$(dirname "${0}")/common"
+
+require readarray jq
+
+ensure_invoked_from_repo
+ensure_invoked_in_github_actions
+
+readarray -t changed_paths < <(git diff --name-only HEAD origin/master -- | xargs dirname | sort -u)
+declare -t pruned_changed_paths=()
+
+# prune paths, removing any non-module paths
+for p in "${changed_paths[@]}"; do
+	# for a valid module:
+	# 1. the first level of the path should be the name of the module or sub-account (for example, "infrashared")
+	# 2. the path should be exactly two levels deep
+	if [[ ! "${p%%/*}" =~ ^(kinsend-infra)$ ]] ||
+		[[ "$(echo "${p}" | tr -cd '/' | wc -c)" -ne 1 ]]; then
+		log INFO "ignoring changes in '${p}': this is not a valid module path"
+		continue 2
+	fi
+	pruned_changed_paths+=("${p}")
+done
+
+if [[ "${#pruned_changed_paths[@]}" -eq 0 ]]; then
+	echo "status=empty" >> $GITHUB_OUTPUT
+	log WARN "no modules have been changed, nothing to do"
+else
+	echo "module_path_matrix=$(printf '%s\n' "${pruned_changed_paths[@]}" | jq -jcnR '{module_path:[inputs]}')" >> $GITHUB_OUTPUT
+	echo "status=ok" >> $GITHUB_OUTPUT
+fi

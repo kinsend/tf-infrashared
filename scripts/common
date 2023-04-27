@@ -1,0 +1,35 @@
+# shellcheck shell=bash
+
+# returns a timestamp in the same format that terraform logs do
+function timestamp() {
+	echo "$(date -u +%Y-%m-%dT%H:%I:%S).$((10#$(date -u +%N)/1000000))Z"
+}
+
+function log() {
+	echo "$(timestamp) [${1}] ${*:2}"
+	if [[ "${1}" == "FATAL" ]]; then
+		exit 1
+	fi
+}
+
+function require() {
+	for v in "${@}"; do
+		hash "${v}" >/dev/null 2>&1 || log FATAL "please install ${v}"
+	done
+}
+
+# ensure this is run in the context of a github action runner
+function ensure_invoked_in_github_actions() {
+    if [[ "${CI:-}" != "true" ]]; then
+        log FATAL "this script should only be run in the context of github actions"
+    fi
+}
+
+require git
+
+# ensure this is run from inside this repository
+function ensure_invoked_from_repo() {
+    if [[ ! "$(git remote get-url origin 2> /dev/null)" =~ ^(git@github.com:|https://github.com/)kinsend/tf-infrashared(.git)?$ ]]; then
+        log FATAL "this script should only be used in kinsend/tf-infrashared"
+    fi
+}

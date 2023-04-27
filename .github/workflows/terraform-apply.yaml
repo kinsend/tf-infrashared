@@ -1,0 +1,130 @@
+name: terraform-apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        type: string
+        name: Issue number (for prs)
+        required: false
+
+  workflow_call:
+
+jobs:
+
+  setup:
+    runs-on: ks-linux
+    steps:
+      - uses: LouisBrunner/checks-action@v1.6.0
+        name: post job result
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: terraform-apply
+          status: in_progress
+
+      - uses: actions/checkout@v3
+
+      - name: fetch master branch
+        run: git fetch origin master
+
+      - name: detect changed module path
+        id: detect
+        run: ./scripts/actions-detect-modules
+
+    outputs:
+      module_path_matrix: ${{ steps.detect.outputs.module_path_matrix }}
+      status: ${{ steps.detect.outputs.status }}
+
+  # the apply job is run when there is a comment in the pull request that
+  # satisfies the following:
+  # - contains the string '/apply'
+  # - is written by a user who is an OWNER of the repository
+  # - setup and plan have ran successfully
+  apply:
+    runs-on: ks-linux
+    needs:
+      - setup
+    if: ${{ needs.setup.outputs.status == 'ok' }}
+    strategy:
+      matrix: ${{fromJSON(needs.setup.outputs.module_path_matrix)}}
+    defaults:
+      run:
+        working-directory: ${{ matrix.module_path }}
+    env:
+      TF_CLI_ARGS: '-no-color'
+      TF_VAR_aws_profile: kinsend-infra
+      TF_LOG: error
+
+    steps:
+#      - uses: LouisBrunner/checks-action@v1.6.0
+#        if: always()
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          name: terraform-apply
+#          conclusion: ${{ job.status }}
+
+      - uses: actions/checkout@v3
+
+      - name: update $PATH
+        run: echo "${GITHUB_WORKSPACE}/scripts" >> "${GITHUB_PATH}"
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: setup SSH configuration
+        run: actions-setup-ssh-config
+        env:
+          SSH_KEY: ${{ secrets.CS_DEVOPS_BOT_SSH_KEY }}
+
+      - name: setup AWS configuration
+        run: actions-setup-aws-config
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.5
+
+      - name: init
+        id: init
+        run: terraform init
+
+      - name: apply
+        id: apply
+        run: terraform apply -auto-approve
+
+      - name: post results
+        if: always()
+        uses: actions/github-script@v6
+        continue-on-error: true
+        env:
+          STEP_INIT_OUTCOME: ${{ steps.init.outcome }}
+          STEP_INIT_STDERR: ${{ steps.init.outputs.stderr }}
+          STEP_INIT_STDOUT: ${{ steps.init.outputs.stdout }}
+          STEP_APPLY_OUTCOME: ${{ steps.apply.outcome }}
+          STEP_APPLY_STDERR: ${{ steps.apply.outputs.stderr }}
+          STEP_APPLY_STDOUT: ${{ steps.apply.outputs.stdout }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const helpers = require('./scripts/actions-script-helpers.js');
+        
+            helpers.commentResults(
+              github,
+              context,
+              '${{ inputs.issue_number }}',
+              '${{ matrix.module_path }}',
+              [
+                {name: "init"},
+                {name: "apply", detailedSuccess: true},
+              ],
+            );
+
+      - uses: LouisBrunner/checks-action@v1.6.0
+        name: post job result
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: terraform-apply
+          conclusion: ${{ job.status }}
+          status: completed
