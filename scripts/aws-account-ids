@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This script is used to provide the various AWS account IDs as a bash
+# associative array, if sourced, or as a json map if invoked independently.
+declare -A aws_account_ids=(
+  [infra]="202337591493"
+  [dev]="065306182146"
+  [prod]="113902669333"
+  )
+
+# stop here if the script is being sourced: return is only allowed at the top
+# level if this file is being sourced, otherwise it will error out
+return 0 2>/dev/null || true
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+source "$(dirname "${0}")/common"
+
+require jq
+
+for env in "${!aws_account_ids[@]}"; do
+	echo "${env}"
+	echo "${aws_account_ids[$env]}"
+done | jq -cnR 'reduce inputs as $i ({}; . + { ($i): input })'

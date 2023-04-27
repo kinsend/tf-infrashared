@@ -1,0 +1,7 @@
+# devops is set as the codeowner for everything, to ensure that there is always
+# at least one owner
+*   @kinsend/devops
+
+# various teams can be set as owners for their resources below
+
+*   @kinsend/devops

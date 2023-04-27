@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# This script is used to generate an AWS config file which is used with the
+# Github actions workflows. The config is generated at the root of the
+# repository and the environment variable AWS_CONFIG_FILE is used to point
+# the libraries and tools to it.
+
+source "$(dirname "${0}")/common"
+
+ensure_invoked_from_repo
+ensure_invoked_in_github_actions
+
+repo_root_path="$(git rev-parse --show-toplevel)"
+aws_config_path="${repo_root_path}/.aws_config"
+
+rm -f "${aws_config_path}"
+touch "${aws_config_path}"
+
+source "$(dirname "${0}")/aws-account-ids"
+
+for env in "${!aws_account_ids[@]}"; do
+	cat <<EOF >>"${aws_config_path}"
+[profile kinsend-${env}]
+region            = us-east-1
+role_arn          = arn:aws:iam::${aws_account_ids[${env}]}:role/kinsend-ci-admin
+credential_source = Ec2InstanceMetadata
+EOF
+done
+
+echo "AWS_CONFIG_FILE=${aws_config_path}" >> "${GITHUB_ENV}"
