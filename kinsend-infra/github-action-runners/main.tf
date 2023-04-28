@@ -293,9 +293,9 @@ module "runners_linux" {
   vpc_zone_identifier = [ data.aws_subnet.infrashared.id ]
 
   health_check_type         = "EC2"
-  desired_capacity          = 1
-  min_size                  = 1
-  max_size                  = 3
+  desired_capacity          = 10
+  min_size                  = 10
+  max_size                  = 30
   wait_for_capacity_timeout = 0
   service_linked_role_arn   = aws_iam_service_linked_role.autoscaling.arn
   iam_instance_profile_arn  = aws_iam_instance_profile.ghar.arn
