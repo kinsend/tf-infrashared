@@ -20,7 +20,7 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: terraform-apply
+          name: apply
           status: in_progress
 
       - uses: actions/checkout@v3
@@ -56,13 +56,17 @@ jobs:
       TF_VAR_aws_profile: kinsend-infra
       TF_LOG: error
 
+    # This permission is required to allow writing comments and reporting check status.
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+      issues: write
+      pull-requests: write
+      repository-projects: read
+      statuses: write
+
     steps:
-#      - uses: LouisBrunner/checks-action@v1.6.0
-#        if: always()
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          name: terraform-apply
-#          conclusion: ${{ job.status }}
 
       - uses: actions/checkout@v3
 
@@ -123,8 +127,9 @@ jobs:
       - uses: LouisBrunner/checks-action@v1.6.0
         name: post job result
         if: always()
+        continue-on-error: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: terraform-apply
+          name: apply
           conclusion: ${{ job.status }}
           status: completed
