@@ -1,7 +1,6 @@
 This repository contains the Terraform scripts for the Github Action Runners infrastructure.
 
-[![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/4535ea2b-a512-41c4-bdd0-9d2eb48643d9/repos/cd5d22c5-4b2f-4f39-9af8-d783c2e91cbe/branch/a54d6382-afa1-428a-89d3-cc980875ab73)](https://dashboard.infracost.io/org/kinsend/repos/cd5d22c5-4b2f-4f39-9af8-d783c2e91cbe?settings#config-file-editor)
-
+[![infracost](https://img.shields.io/endpoint?url=https://dashboard.api.infracost.io/shields/json/dce02035-0c10-4942-b771-659bbc2a148a/repos/066d544b-0b1a-4752-9188-5dc8e6760f3f/branch/dac4f59b-6760-4f95-95c0-200ef5486336)](https://dashboard.infracost.io/org/kinsend/repos/066d544b-0b1a-4752-9188-5dc8e6760f3f)
 # Pre-requisites
 
 * AWS
