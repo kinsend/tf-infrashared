@@ -39,6 +39,8 @@ resource "aws_iam_role" "ghar_admin" {
     aws_iam_policy.allow_action_runner_to_manage_roles.arn,
     // Allow managing specific profiles (EC2 instance profile)
     aws_iam_policy.allow_action_runner_to_manage_profiles.arn,
+    // Allow Autoscaling access
+    aws_iam_policy.allow_action_runner_to_manage_launch_configurations.arn,
     // Allow secrets access
     aws_iam_policy.ghar-secrets_access.arn,
     // ?? TODO: Is this necessary, considering we have AmazonEC2FullAccess ?
@@ -147,6 +149,28 @@ resource "aws_iam_policy" "allow_action_runner_to_manage_profiles" {
     ]
   })
 }
+
+resource "aws_iam_policy" "allow_action_runner_to_manage_launch_configurations" {
+  name   = "${var.brand}-${var.name}-manage-launch-configurations"
+  path   = "/"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "autoscaling:CreateLaunchConfiguration",
+          "autoscaling:DeleteLaunchConfiguration",
+          "autoscaling:DescribeLaunchConfigurations"
+        ]
+        Effect   = "Allow"
+        Resource = [
+          "arn:aws:iam::${var.aws_account_id_infrashared}:instance-profile/${var.brand}-${var.name}-*"
+        ]
+      }
+    ]
+  })
+}
+
 
 resource "aws_iam_policy" "ghar-secrets_access" {
   name   = "${var.brand}-${var.name}-secrets-access"
@@ -271,7 +295,7 @@ module "runners_linux" {
   name                  = var.name_linux
   image_id              = data.aws_ami.ami_linux.id
   instance_type         = var.instance_type_linux
-  security_groups       = [data.aws_security_group.default.id]
+  security_groups       = [data.aws_security_group.default.id, data.aws_security_group.infrashared.id]
   key_name              = aws_key_pair.ssh_access_key.key_name
 
   # recreate_asg_when_lc_changes = true

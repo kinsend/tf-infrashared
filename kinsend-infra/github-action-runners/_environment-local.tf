@@ -58,6 +58,12 @@ data "aws_security_group" "default" {
   name   = "default"
 }
 
+# Token for github actions:
+data "aws_security_group" "infrashared" {
+  vpc_id = data.aws_vpc.vpc_infrashared.id
+  name = "${var.brand}-infrashared"
+}
+
 # This needs to be created manually first and the ARN must be updated here
 data "aws_secretsmanager_secret" "github_token" {
   arn = "arn:aws:secretsmanager:${var.aws_region}:202337591493:secret:github/tokens/ks-devops-bot/github-action-runners-9fwIqa"
