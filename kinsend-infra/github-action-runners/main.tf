@@ -35,39 +35,48 @@ resource "aws_iam_role" "ghar_admin" {
   managed_policy_arns = [
     // Allow EC2 Admin access
     data.aws_iam_policy.AmazonEC2FullAccess.arn,
-    // Allow managing specific roles.
-    aws_iam_policy.allow_action_runner_to_manage_roles.arn,
-    // Allow managing specific profiles (EC2 instance profile)
-    aws_iam_policy.allow_action_runner_to_manage_profiles.arn,
-    // Allow managing specific policies
-    aws_iam_policy.allow_action_runner_to_manage_policies.arn,
-    // Allow Autoscaling access
-    aws_iam_policy.allow_action_runner_to_manage_launch_configurations.arn,
-    // Allow secrets access
-    aws_iam_policy.ghar-secrets_access.arn,
-    // ?? TODO: Is this necessary, considering we have AmazonEC2FullAccess ?
-    //aws_iam_policy.ghar_admin_describe_images.arn
     // SSM access
     data.aws_iam_policy.AmazonSSMFullAccess.arn,
     // VPC read-only access
     data.aws_iam_policy.AmazonVPCReadOnlyAccess.arn,
-    // Allow decoding messages.
-    aws_iam_policy.allow_decode_authorization_message.arn,
     // Allow access to terraform state.
     aws_iam_policy.terraform_state_access.arn,
     // Allow ECR access
     aws_iam_policy.ecr-access.arn,
-    // ?? TODO: Allow self-management on EC2 probably doesn't make sense?
-    // data.aws_iam_policy.iam_self_management.arn
+    // Aggregated policy (Policy limit is 10)
+    aws_iam_policy.action_runner_aggregated_policies.arn
   ]
 }
 
-resource "aws_iam_policy" "allow_action_runner_to_manage_roles" {
-  name   = "${var.brand}-${var.name}-manage-roles"
+resource "aws_iam_policy" "action_runner_aggregated_policies" {
+  name   = "${var.brand}-${var.name}-aggregated-policies"
   path   = "/"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      // allow_action_runner_to_manage_policies
+      {
+        // Overall management access to self assigned profiles
+        Action = [
+          "iam:CreateInstanceProfile",
+          "iam:DeleteInstanceProfile",
+          "iam:ListInstanceProfilesForRole",
+          "iam:GetInstanceProfile",
+          "iam:RemoveRoleFromInstanceProfile",
+          "iam:ListInstanceProfileTags",
+          "iam:ListInstanceProfiles",
+          "iam:UntagInstanceProfile",
+          "iam:AddRoleToInstanceProfile",
+          "iam:TagInstanceProfile"
+        ]
+        Effect   = "Allow"
+        Resource = [
+          "arn:aws:iam::${var.aws_account_id_infrashared}:instance-profile/${var.brand}-${var.name}-*"
+        ]
+      },
+      // /allow_action_runner_to_manage_policies
+
+      // allow_action_runner_to_manage_roles
       {
         // Overall read access to all roles
         Action = [
@@ -120,77 +129,10 @@ resource "aws_iam_policy" "allow_action_runner_to_manage_roles" {
           "arn:aws:iam::${var.aws_account_id_infrashared}:policy/${var.brand}-${var.name}-*",
           "arn:aws:iam::aws:policy/Amazon*" // aws managed policies.
         ]
-      }
-    ]
-  })
-}
+      },
+      // /allow_action_runner_to_manage_roles
 
-resource "aws_iam_policy" "allow_action_runner_to_manage_profiles" {
-  name   = "${var.brand}-${var.name}-manage-profiles"
-  path   = "/"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        // Overall management access to self assigned profiles
-        Action = [
-          "iam:CreateInstanceProfile",
-          "iam:DeleteInstanceProfile",
-          "iam:ListInstanceProfilesForRole",
-          "iam:GetInstanceProfile",
-          "iam:RemoveRoleFromInstanceProfile",
-          "iam:ListInstanceProfileTags",
-          "iam:ListInstanceProfiles",
-          "iam:UntagInstanceProfile",
-          "iam:AddRoleToInstanceProfile",
-          "iam:TagInstanceProfile"
-        ]
-        Effect   = "Allow"
-        Resource = [
-          "arn:aws:iam::${var.aws_account_id_infrashared}:instance-profile/${var.brand}-${var.name}-*"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "allow_action_runner_to_manage_policies" {
-  name   = "${var.brand}-${var.name}-manage-policies"
-  path   = "/"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        // Overall management access to self assigned profiles
-        Action = [
-          "iam:AttachGroupPolicy",
-          "iam:CreatePolicy",
-          "iam:CreatePolicyVersion",
-          "iam:DeletePolicy",
-          "iam:DeletePolicyVersion",
-          "iam:GetPolicy",
-          "iam:GetPolicyVersion",
-          "iam:ListPolicy",
-          "iam:ListPolicyTags",
-          "iam:ListPolicyVersions",
-          "iam:TagPolicy",
-          "iam:UntagPolicy"
-        ]
-        Effect   = "Allow"
-        Resource = [
-          "arn:aws:iam::${var.aws_account_id_infrashared}:policy/${var.brand}-${var.name}-*"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "allow_action_runner_to_manage_launch_configurations" {
-  name   = "${var.brand}-${var.name}-manage-launch-configurations"
-  path   = "/"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+      // allow_action_runner_to_manage_launch_configurations
       {
         Action = [
           "autoscaling:CreateLaunchConfiguration",
@@ -202,36 +144,25 @@ resource "aws_iam_policy" "allow_action_runner_to_manage_launch_configurations" 
           "arn:aws:iam::${var.aws_account_id_infrashared}:instance-profile/${var.brand}-${var.name}-*",
           "arn:aws:iam::${var.aws_account_id_infrashared}:policy/${var.brand}-${var.name}-*"
         ]
-      }
-    ]
-  })
-}
+      },
+      // /allow_action_runner_to_manage_launch_configurations
 
-resource "aws_iam_policy" "ghar-secrets_access" {
-  name   = "${var.brand}-${var.name}-secrets-access"
-  path   = "/"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+      // allow_secrets_access
       {
         Action    = [ "secretsmanager:DescribeSecret", "secretsmanager:List*", "secretsmanager:Get*" ]
         Effect    = "Allow"
         Resource  = [ "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account_id_infrashared}:*" ]
-      }
-    ]
-  })
-}
+      },
+      // /allow_secrets_access
 
-resource "aws_iam_policy" "allow_decode_authorization_message" {
-  name   = "${var.brand}-${var.name}-decode_authorization_message"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+      // allow_decode_authorization_message
       {
         Action    = [ "sts:DecodeAuthorizationMessage" ]
         Effect    = "Allow"
         Resource  = [ "*" ]
       }
+      // /allow_decode_authorization_message
+
     ]
   })
 }
