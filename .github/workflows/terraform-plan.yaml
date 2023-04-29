@@ -39,7 +39,7 @@ jobs:
       TF_VAR_aws_profile: kinsend-infra
       TF_LOG: error
 
-    # This permission is required to allow writing comments and reporting check status.
+    # These permissions are required to allow writing comments and reporting check status.
     permissions:
       actions: read
       checks: write

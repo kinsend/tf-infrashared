@@ -261,7 +261,7 @@ data "aws_subnet" "infrashared" {
 }
 
 resource "aws_key_pair" "ssh_access_key" {
-  key_name   = "${var.brand}-ssh-rsa"
+  key_name   = "${var.brand}-infrashared-ssh-rsa"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1oDr7DHROHeui3N5Ufa921RN3heEA71lJggHvBYYb/Fbig4B3hyCxUtF47RfIu/ofZfYA/FdCNoqqkg4X19oM3J5VoWt95f4LtHoImKTYVfE3SD2AauZOqbDRz7tOiqyek9WEihX8ZgFTdMnJLvaIvKaNOKYWOG4LCnhIOOWJ4XhlApWFXcz1+kRh4NlLex1xoditwjR1euU4XbPCToDztzaVC/3kum+RYeruElpWVGpFbWN8W0E4qr1fM5zpISovbSo3FiuM2lVieAEP5Y8A0olmbrC4lPew9NCpn8GpNE2BgCAAen3SNQhJbj0EKBzcRrqaaMYMdJK044CScy2kyLOA0hEkxwN7MqmuYTxIelayOQKWKQSdVIR22PJwsWnFexOZCo07H/3GhPqA4ay/yn9d+2NF62M+hCI+dIaE/N7HNW/AoAEZDlitfJp9B9JzFyiFQjGmZFjYWeFPYDeo6yLdZk0GqrOwwtW0cSbkVZAAnxLkzetZMindmksdHmU= ks-dev@kinsend.io"
 }
 
