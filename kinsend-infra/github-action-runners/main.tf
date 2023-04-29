@@ -95,6 +95,8 @@ resource "aws_iam_policy" "allow_action_runner_to_manage_roles" {
           "iam:RemoveRoleFromInstanceProfile",
           "iam:AddRoleToInstanceProfile",
           "iam:CreateRole",
+          "iam:GetRole",
+          "iam:PassRole",
           "iam:DeleteRole",
           "iam:UpdateRole",
           "iam:AttachRolePolicy",
