@@ -48,17 +48,14 @@ variable "aws_account_id_infrashared" {
 variable "aws_account_ids" {
   type        = map(string)
   description = "Map of the various AWS account IDs"
-  # Root
-  #"202337591493",
-  # Dev
-  #"065306182146",
-  # Prod
-  #"113902669333"
 
   default     = {
-    "infrashared" = "202337591493"
-    #    "dev"  = "065306182146"
-    #    "prod" = "113902669333"
+    # Infrashared
+    "kinsend-infra" = "202337591493",
+    # Dev
+    "kinsend-dev"   = "065306182146",
+    # Prod
+    "kinsend-prod"  = "113902669333"
   }
 }
 
