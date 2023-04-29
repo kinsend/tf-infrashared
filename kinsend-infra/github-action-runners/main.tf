@@ -39,6 +39,8 @@ resource "aws_iam_role" "ghar_admin" {
     aws_iam_policy.allow_action_runner_to_manage_roles.arn,
     // Allow managing specific profiles (EC2 instance profile)
     aws_iam_policy.allow_action_runner_to_manage_profiles.arn,
+    // Allow managing specific policies
+    aws_iam_policy.allow_action_runner_to_manage_policies.arn,
     // Allow Autoscaling access
     aws_iam_policy.allow_action_runner_to_manage_launch_configurations.arn,
     // Allow secrets access
@@ -152,6 +154,37 @@ resource "aws_iam_policy" "allow_action_runner_to_manage_profiles" {
   })
 }
 
+resource "aws_iam_policy" "allow_action_runner_to_manage_policies" {
+  name   = "${var.brand}-${var.name}-manage-policies"
+  path   = "/"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        // Overall management access to self assigned profiles
+        Action = [
+          "iam:AttachGroupPolicy",
+          "iam:CreatePolicy",
+          "iam:CreatePolicyVersion",
+          "iam:DeletePolicy",
+          "iam:DeletePolicyVersion",
+          "iam:GetPolicy",
+          "iam:GetPolicyVersion",
+          "iam:ListPolicy",
+          "iam:ListPolicyTags",
+          "iam:ListPolicyVersions",
+          "iam:TagPolicy",
+          "iam:UntagPolicy"
+        ]
+        Effect   = "Allow"
+        Resource = [
+          "arn:aws:iam::${var.aws_account_id_infrashared}:policy/${var.brand}-${var.name}-*"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "allow_action_runner_to_manage_launch_configurations" {
   name   = "${var.brand}-${var.name}-manage-launch-configurations"
   path   = "/"
@@ -166,13 +199,13 @@ resource "aws_iam_policy" "allow_action_runner_to_manage_launch_configurations" 
         ]
         Effect   = "Allow"
         Resource = [
-          "arn:aws:iam::${var.aws_account_id_infrashared}:instance-profile/${var.brand}-${var.name}-*"
+          "arn:aws:iam::${var.aws_account_id_infrashared}:instance-profile/${var.brand}-${var.name}-*",
+          "arn:aws:iam::${var.aws_account_id_infrashared}:policy/${var.brand}-${var.name}-*"
         ]
       }
     ]
   })
 }
-
 
 resource "aws_iam_policy" "ghar-secrets_access" {
   name   = "${var.brand}-${var.name}-secrets-access"
