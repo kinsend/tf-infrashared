@@ -84,24 +84,24 @@ region          = us-east-1
 
 [profile kinsend-iam]
 region          = us-east-1
-mfa_serial      = <YOUR_ACCOUNT_MFA_ARN>
+mfa_serial      = arn:aws:iam::202337591493:mfa/<YOUR_ACCOUNT_MFA_ID>
 
 [profile kinsend-infra]
 region          = us-east-1
-mfa_serial      = <YOUR_ACCOUNT_MFA_ARN>
+mfa_serial      = arn:aws:iam::202337591493:mfa/<YOUR_ACCOUNT_MFA_ID>
 role_arn        = arn:aws:iam::202337591493:role/kinsend-infra
 source_profile  = kinsend-iam
 
 [profile kinsend-dev]
 region          = us-east-1
-mfa_serial      = <YOUR_ACCOUNT_MFA_ARN>
-role_arn        = arn:aws:iam::065306182146:role/kinsend-infra
+mfa_serial      = arn:aws:iam::202337591493:mfa/<YOUR_ACCOUNT_MFA_ID>
+role_arn        = arn:aws:iam::874822220446:role/kinsend-dev
 source_profile  = kinsend-iam
 
 [profile kinsend-prod]
 region          = us-east-1
-mfa_serial      = <YOUR_ACCOUNT_MFA_ARN>
-role_arn        = arn:aws:iam::113902669333:role/kinsend-infra
+mfa_serial      = arn:aws:iam::202337591493:mfa/<YOUR_ACCOUNT_MFA_ID>
+role_arn        = arn:aws:iam::780602547172:role/kinsend-prod
 source_profile  = kinsend-iam
 ```
 * Create a `~/.aws/aws-vault-config` file with the following content:
@@ -110,18 +110,18 @@ source_profile  = kinsend-iam
 region          = us-east-1
 
 [profile kinsend-infra]
-region         = us-east-1
-role_arn       = arn:aws:iam::202337591493:role/kinsend-infra
-source_profile = kinsend-iam
+region          = us-east-1
+role_arn        = arn:aws:iam::202337591493:role/kinsend-infra
+source_profile  = kinsend-iam
 
 [profile kinsend-dev]
 region          = us-east-1
-role_arn        = arn:aws:iam::065306182146:role/kinsend-dev
+role_arn        = arn:aws:iam::874822220446:role/kinsend-dev
 source_profile  = kinsend-iam
 
 [profile kinsend-prod]
 region          = us-east-1
-role_arn        = arn:aws:iam::113902669333:role/kinsend-prod
+role_arn        = arn:aws:iam::780602547172:role/kinsend-prod
 source_profile  = kinsend-iam
 ```
 * Execute:
