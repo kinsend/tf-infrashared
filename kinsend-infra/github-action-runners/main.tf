@@ -86,6 +86,7 @@ resource "aws_iam_policy" "action_runner_aggregated_policies" {
           "iam:ListAttachedRolePolicies",
           "iam:ListRolePolicies",
           "iam:GetRole",
+          "iam:ListPolicyVersions",
           "iam:ListRoles",
           "iam:GetRolePolicy",
           "iam:GetPolicy",
@@ -202,7 +203,9 @@ resource "aws_iam_policy" "ecr-access" {
         Action    = [ "ecr:CreateRepository", "ecr:GetDownloadUrlForLayer", "ecr:BatchGetImage" ]
         Effect    = "Allow"
         Resource  = [
-          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_infrashared}:repository/github-action-runners"
+          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_infrashared}:repository/*",
+          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_dev}:repository/*",
+          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_prod}:repository/*"
         ]
       },
       {

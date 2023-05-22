@@ -4,9 +4,9 @@
 # associative array, if sourced, or as a json map if invoked independently.
 declare -A aws_account_ids=(
   [infra]="202337591493"
-  [dev]="065306182146"
-  [prod]="113902669333"
-  )
+  [dev]="874822220446"
+  [prod]="780602547172"
+)
 
 # stop here if the script is being sourced: return is only allowed at the top
 # level if this file is being sourced, otherwise it will error out

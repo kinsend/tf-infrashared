@@ -45,20 +45,32 @@ variable "aws_account_id_infrashared" {
   default     = "202337591493"
 }
 
+variable "aws_account_id_dev" {
+  type        = string
+  description = "The ID of the kinsend-dev account."
+  default     = "874822220446"
+}
+
+variable "aws_account_id_prod" {
+  type        = string
+  description = "The ID of the kinsend-prod account."
+  default     = "780602547172"
+}
+
 variable "aws_account_ids" {
   type        = map(string)
   description = "Map of the various AWS account IDs"
   # Root
   #"202337591493",
   # Dev
-  #"065306182146",
+  #"874822220446",
   # Prod
-  #"113902669333"
+  #"780602547172"
 
   default     = {
     "infrashared" = "202337591493"
-    #    "dev"  = "065306182146"
-    #    "prod" = "113902669333"
+    "dev" = "874822220446"
+    "prod" = "780602547172"
   }
 }
 
