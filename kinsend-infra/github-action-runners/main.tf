@@ -200,17 +200,24 @@ resource "aws_iam_policy" "ecr-access" {
     Version   = "2012-10-17"
     Statement = [
       {
-        Action    = [ "ecr:CreateRepository",
-                      "ecr:GetDownloadUrlForLayer",
-                      "ecr:BatchGetImage" ,
-                      "ecr:BatchCheckLayerAvailability",
-                      "ecr:CompleteLayerUpload",
-                      "ecr:DescribeImages",
-                      "ecr:DescribeRepositories",
-                      "ecr:InitiateLayerUpload",
-                      "ecr:ListImages",
-                      "ecr:PutImage",
-                      "ecr:UploadLayerPart"
+        Action    = [
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CreateRepository",
+          "ecr:CompleteLayerUpload",
+          "ecr:DescribeRepositories",
+          "ecr:DescribeImages",
+          "ecr:DescribeImageScanFindings",
+          "ecr:DescribeRepositories",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetLifecyclePolicy",
+          "ecr:GetLifecyclePolicyPreview",
+          "ecr:GetRepositoryPolicy",
+          "ecr:ListImages",
+          "ecr:ListTagsForResource",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:PutImage"
         ]
         Effect    = "Allow"
         Resource  = [
