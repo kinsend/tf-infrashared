@@ -200,7 +200,18 @@ resource "aws_iam_policy" "ecr-access" {
     Version   = "2012-10-17"
     Statement = [
       {
-        Action    = [ "ecr:CreateRepository", "ecr:GetDownloadUrlForLayer", "ecr:BatchGetImage" ]
+        Action    = [ "ecr:CreateRepository",
+                      "ecr:GetDownloadUrlForLayer",
+                      "ecr:BatchGetImage" ,
+                      "ecr:BatchCheckLayerAvailability",
+                      "ecr:CompleteLayerUpload",
+                      "ecr:DescribeImages",
+                      "ecr:DescribeRepositories",
+                      "ecr:InitiateLayerUpload",
+                      "ecr:ListImages",
+                      "ecr:PutImage",
+                      "ecr:UploadLayerPart"
+        ]
         Effect    = "Allow"
         Resource  = [
           "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_infrashared}:repository/*",
@@ -222,6 +233,34 @@ resource "aws_iam_instance_profile" "ghar" {
   name = aws_iam_role.ghar_admin.name
   role = aws_iam_role.ghar_admin.name
 }
+
+#resource "aws_iam_role_policy_attachment" "ghar_assume_access" {
+#  count      = length(var.aws_account_ids) > 0 ? 1 : 0
+#  role       = aws_iam_role.ghar_admin.name
+#  policy_arn = aws_iam_policy.ghar_assume_policy.0.arn
+#}
+#
+#resource "aws_iam_policy" "ghar_assume_policy" {
+#  count  = length(var.aws_account_ids) > 0 ? 1 : 0
+#  name   = "${var.brand}-${var.name}-admin"
+#  policy = data.aws_iam_policy_document.ghar_allow_assume.json
+#}
+#
+#locals {
+#  assume_roles = [
+#    for acct in var.aws_account_ids :
+#    join(":", ["arn:aws:iam:", acct, "role/${var.brand}-${var.name}-admin"])
+#  ]
+#}
+#
+#data "aws_iam_policy_document" "ghar_allow_assume" {
+#  statement {
+#    sid       = "1"
+#    actions   = ["sts:AssumeRole"]
+#    effect    = "Allow"
+#    resources = local.assume_roles
+#  }
+#}
 
 data "aws_iam_policy" "AmazonSSMFullAccess" {
   arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"

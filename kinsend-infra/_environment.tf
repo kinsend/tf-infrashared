@@ -57,7 +57,7 @@ variable "aws_account_id_prod" {
   default     = "780602547172"
 }
 
-variable "aws_account_ids" {
+variable "aws_accounts" {
   type        = map(string)
   description = "Map of the various AWS account IDs"
   # Root
@@ -73,6 +73,20 @@ variable "aws_account_ids" {
     "prod" = "780602547172"
   }
 }
+
+variable "aws_account_ids" {
+  default = [ # infrashared"
+              "202337591493",
+              # dev
+              "874822220446",
+              # prod
+              "780602547172"
+  ]
+
+  type        = list(any)
+  description = "List of accounts that this runner will have access to assume roles into"
+}
+
 
 variable "aws_profile" {
   type        = string
