@@ -61,6 +61,18 @@ resource "aws_iam_policy" "action_runner_aggregated_policies" {
           Effect    = "Allow"
           Resource  = "arn:aws:iam::${var.aws_account_id_infrashared}:role/kinsend-infra"
       },
+      {
+          Sid       = ""
+          Action    = ["sts:AssumeRole"]
+          Effect    = "Allow"
+          Resource  = "arn:aws:iam::${var.aws_account_id_prod}:role/kinsend-prod"
+      },
+      {
+          Sid       = ""
+          Action    = ["sts:AssumeRole"]
+          Effect    = "Allow"
+          Resource  = "arn:aws:iam::${var.aws_account_id_dev}:role/kinsend-dev"
+      },
       // /allow_action_runner_to_assume_role
       // allow_action_runner_to_manage_policies
       {
