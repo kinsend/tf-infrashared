@@ -54,6 +54,14 @@ resource "aws_iam_policy" "action_runner_aggregated_policies" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      // allow_action_runner_to_assume_role_kinsend-infra
+      {
+          Sid       = ""
+          Action    = ["sts:AssumeRole"]
+          Effect    = "Allow"
+          Resource  = "arn:aws:iam::${var.aws_account_id_infrashared}:role/kinsend-infra"
+      },
+      // /allow_action_runner_to_assume_role
       // allow_action_runner_to_manage_policies
       {
         // Overall management access to self assigned profiles
