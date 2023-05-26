@@ -17,9 +17,6 @@ source "$(dirname "${0}")/common"
 
 require readarray jq
 
-ensure_invoked_from_repo
-ensure_invoked_in_github_actions
-
 readarray -t changed_paths < <(git diff --name-only HEAD origin/master -- | xargs dirname | sort -u)
 declare -t pruned_changed_paths=()
 

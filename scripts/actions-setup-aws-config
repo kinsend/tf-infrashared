@@ -11,9 +11,6 @@ set -o nounset
 
 source "$(dirname "${0}")/common"
 
-ensure_invoked_from_repo
-ensure_invoked_in_github_actions
-
 repo_root_path="$(git rev-parse --show-toplevel)"
 aws_config_path="${repo_root_path}/.aws_config"
 
