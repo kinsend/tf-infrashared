@@ -26,9 +26,19 @@ EOF
 chmod +x /usr/local/bin/getpass.sh
 
 # Login to ECR
-$(aws ecr get-login --region us-east-1 --no-include-email)
+$(aws ecr get-login-password --region us-east-1 --no-include-email)
 
 docker run -d --restart always --name github-runner1 \
+  -e DISABLE_AUTO_UPDATE="true" \
+  -e RUNNER_WORKDIR="/actions-runner" \
+  -e ACCESS_TOKEN="${github_token}" \
+  -e RUNNER_SCOPE="org" \
+  -e ORG_NAME="kinsend" \
+  -e LABELS="ks-linux" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ${runner_image}:${runner_image_version}
+
+docker run -d --restart always --name github-runner2 \
   -e DISABLE_AUTO_UPDATE="true" \
   -e RUNNER_WORKDIR="/actions-runner" \
   -e ACCESS_TOKEN="${github_token}" \
