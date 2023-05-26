@@ -26,7 +26,7 @@ EOF
 chmod +x /usr/local/bin/getpass.sh
 
 # Login to ECR
-$(aws ecr get-login-password --region us-east-1 --no-include-email)
+$(aws ecr get-login --region us-east-1 --no-include-email)
 
 docker run -d --restart always --name github-runner1 \
   -e DISABLE_AUTO_UPDATE="true" \
