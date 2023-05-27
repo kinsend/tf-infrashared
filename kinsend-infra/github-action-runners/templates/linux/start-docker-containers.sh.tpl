@@ -26,7 +26,12 @@ EOF
 chmod +x /usr/local/bin/getpass.sh
 
 # Login to ECR
-$(aws ecr get-login --region us-east-1 --no-include-email)
+# infrashared
+$(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 202337591493.dkr.ecr.us-east-1.amazonaws.com)
+# dev
+$(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 874822220446.dkr.ecr.us-east-1.amazonaws.com)
+# proc
+$(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 113902669333.dkr.ecr.us-east-1.amazonaws.com)
 
 docker run -d --restart always --name github-runner1 \
   -e DISABLE_AUTO_UPDATE="true" \
