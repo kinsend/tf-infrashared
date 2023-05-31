@@ -54,6 +54,26 @@ resource "aws_iam_policy" "action_runner_aggregated_policies" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      // allow_action_runner_to_assume_role_kinsend-infra
+      {
+          Sid       = ""
+          Action    = ["sts:AssumeRole"]
+          Effect    = "Allow"
+          Resource  = "arn:aws:iam::${var.aws_account_id_infrashared}:role/kinsend-infra"
+      },
+      {
+          Sid       = ""
+          Action    = ["sts:AssumeRole"]
+          Effect    = "Allow"
+          Resource  = "arn:aws:iam::${var.aws_account_id_prod}:role/kinsend-prod"
+      },
+      {
+          Sid       = ""
+          Action    = ["sts:AssumeRole"]
+          Effect    = "Allow"
+          Resource  = "arn:aws:iam::${var.aws_account_id_dev}:role/kinsend-dev"
+      },
+      // /allow_action_runner_to_assume_role
       // allow_action_runner_to_manage_policies
       {
         // Overall management access to self assigned profiles
@@ -86,6 +106,7 @@ resource "aws_iam_policy" "action_runner_aggregated_policies" {
           "iam:ListAttachedRolePolicies",
           "iam:ListRolePolicies",
           "iam:GetRole",
+          "iam:ListPolicyVersions",
           "iam:ListRoles",
           "iam:GetRolePolicy",
           "iam:GetPolicy",
@@ -199,10 +220,30 @@ resource "aws_iam_policy" "ecr-access" {
     Version   = "2012-10-17"
     Statement = [
       {
-        Action    = [ "ecr:CreateRepository", "ecr:GetDownloadUrlForLayer", "ecr:BatchGetImage" ]
+        Action    = [
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CreateRepository",
+          "ecr:CompleteLayerUpload",
+          "ecr:DescribeRepositories",
+          "ecr:DescribeImages",
+          "ecr:DescribeImageScanFindings",
+          "ecr:DescribeRepositories",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetLifecyclePolicy",
+          "ecr:GetLifecyclePolicyPreview",
+          "ecr:GetRepositoryPolicy",
+          "ecr:ListImages",
+          "ecr:ListTagsForResource",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:PutImage"
+        ]
         Effect    = "Allow"
         Resource  = [
-          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_infrashared}:repository/github-action-runners"
+          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_infrashared}:repository/*",
+          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_dev}:repository/*",
+          "arn:aws:ecr:${var.aws_region}:${var.aws_account_id_prod}:repository/*"
         ]
       },
       {
@@ -219,6 +260,34 @@ resource "aws_iam_instance_profile" "ghar" {
   name = aws_iam_role.ghar_admin.name
   role = aws_iam_role.ghar_admin.name
 }
+
+#resource "aws_iam_role_policy_attachment" "ghar_assume_access" {
+#  count      = length(var.aws_account_ids) > 0 ? 1 : 0
+#  role       = aws_iam_role.ghar_admin.name
+#  policy_arn = aws_iam_policy.ghar_assume_policy.0.arn
+#}
+#
+#resource "aws_iam_policy" "ghar_assume_policy" {
+#  count  = length(var.aws_account_ids) > 0 ? 1 : 0
+#  name   = "${var.brand}-${var.name}-admin"
+#  policy = data.aws_iam_policy_document.ghar_allow_assume.json
+#}
+#
+#locals {
+#  assume_roles = [
+#    for acct in var.aws_account_ids :
+#    join(":", ["arn:aws:iam:", acct, "role/${var.brand}-${var.name}-admin"])
+#  ]
+#}
+#
+#data "aws_iam_policy_document" "ghar_allow_assume" {
+#  statement {
+#    sid       = "1"
+#    actions   = ["sts:AssumeRole"]
+#    effect    = "Allow"
+#    resources = local.assume_roles
+#  }
+#}
 
 data "aws_iam_policy" "AmazonSSMFullAccess" {
   arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
