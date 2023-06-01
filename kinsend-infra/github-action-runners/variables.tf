@@ -11,13 +11,13 @@ variable "runner_image_dev" {
 }
 
 variable "runner_image_version" {
-  default     = "1.0.1"
+  default     = "1.0.2"
   type        = string
   description = "runner image version"
 }
 
 variable "runner_image_version_dev" {
-  default     = "1.0.1"
+  default     = "1.0.2"
   type        = string
   description = "runner image version"
 }
@@ -49,7 +49,7 @@ variable "env" {
 variable "instance_type_linux" {
   description = "The type of EC2 instance to provision for the Linux-based Github Action Runners"
   # default     = "t2.small"
-  default     = "t2.medium"
+  default     = "t2.large"
 }
 
 variable "instance_type_windows" {

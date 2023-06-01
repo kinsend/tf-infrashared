@@ -33,22 +33,18 @@ $(aws ecr get-login-password --region us-east-1 | docker login --username AWS --
 # proc
 $(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 113902669333.dkr.ecr.us-east-1.amazonaws.com)
 
-docker run -d --restart always --name github-runner1 \
-  -e DISABLE_AUTO_UPDATE="true" \
-  -e RUNNER_WORKDIR="/actions-runner" \
-  -e ACCESS_TOKEN="${github_token}" \
-  -e RUNNER_SCOPE="org" \
-  -e ORG_NAME="kinsend" \
-  -e LABELS="ks-linux" \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  ${runner_image}:${runner_image_version}
+agents=2
 
-docker run -d --restart always --name github-runner2 \
-  -e DISABLE_AUTO_UPDATE="true" \
-  -e RUNNER_WORKDIR="/actions-runner" \
-  -e ACCESS_TOKEN="${github_token}" \
-  -e RUNNER_SCOPE="org" \
-  -e ORG_NAME="kinsend" \
-  -e LABELS="ks-linux" \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  ${runner_image}:${runner_image_version}
+for i in $(seq 1 $agents); do
+
+  docker run -d --restart always --name "github-runner-$i" \
+    -e DISABLE_AUTO_UPDATE="true" \
+    -e RUNNER_WORKDIR="/actions-runner" \
+    -e ACCESS_TOKEN="${github_token}" \
+    -e RUNNER_SCOPE="org" \
+    -e ORG_NAME="kinsend" \
+    -e LABELS="ks-linux" \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    ${runner_image}:${runner_image_version}
+
+done
