@@ -190,7 +190,9 @@ resource "aws_iam_policy" "terraform_state_access" {
         Action    = [ "dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:DeleteItem" ]
         Effect    = "Allow"
         Resource  = [
-          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id_infrashared}:table/terraform-state-lock"
+          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id_infrashared}:table/terraform-state-lock",
+          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id_prod}:table/terraform-state-lock",
+          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id_dev}:table/terraform-state-lock"
         ]
       },
       {
@@ -198,8 +200,12 @@ resource "aws_iam_policy" "terraform_state_access" {
         Action    = [ "s3:ListBucket", "s3:GetObject", "s3:PutObject" ]
         Effect    = "Allow"
         Resource  = [
-          "arn:aws:s3:::${var.terraform_state_bucket}",
-          "arn:aws:s3:::${var.terraform_state_bucket}/*"
+          "arn:aws:s3:::${var.terraform_state_bucket_infra}",
+          "arn:aws:s3:::${var.terraform_state_bucket_infra}/*",
+          "arn:aws:s3:::${var.terraform_state_bucket_prod}",
+          "arn:aws:s3:::${var.terraform_state_bucket_prod}/*",
+          "arn:aws:s3:::${var.terraform_state_bucket_dev}",
+          "arn:aws:s3:::${var.terraform_state_bucket_dev}/*",
         ]
       }
     ]
