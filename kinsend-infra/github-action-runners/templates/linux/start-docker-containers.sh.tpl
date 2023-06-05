@@ -39,7 +39,7 @@ for i in $(seq 1 $agents); do
 
   docker run -d --restart always --name "github-runner-$i" \
     -e DISABLE_AUTO_UPDATE="true" \
-    -e RUNNER_WORKDIR="/actions-runner" \
+    -e RUNNER_WORKDIR="/actions-runner/_workspaces" \
     -e ACCESS_TOKEN="${github_token}" \
     -e RUNNER_SCOPE="org" \
     -e ORG_NAME="kinsend" \
