@@ -111,10 +111,22 @@ variable "environment_name" {
   default     = "prod"
 }
 
-variable "terraform_state_bucket" {
+variable "terraform_state_bucket_infra" {
   type        = string
   description = "The name of the remote terraform state bucket"
   default     = "kinsend-infra-tf-state"
+}
+
+variable "terraform_state_bucket_prod" {
+  type        = string
+  description = "The name of the remote production terraform state bucket"
+  default     = "kinsend-prod-tf-state"
+}
+
+variable "terraform_state_bucket_dev" {
+  type        = string
+  description = "The name of the remote development terraform state bucket"
+  default     = "kinsend-dev-tf-state"
 }
 
 variable "terraform_state_profile" {
