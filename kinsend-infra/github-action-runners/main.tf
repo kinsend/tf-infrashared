@@ -27,7 +27,13 @@ resource "aws_iam_role" "ghar_admin" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          Service = "ec2.amazonaws.com"
+          Service = "ec2.amazonaws.com",
+          // This allows devops users to assume the `ghar_admin` and test things from it's perspective via aws-vault exec kinsend-runner.
+          AWS = [
+             "arn:aws:iam::202337591493:user/martin.todorov",
+             "arn:aws:iam::202337591493:user/mtodorov",
+             "arn:aws:iam::202337591493:user/steve.todorov",
+          ]
         }
       },
     ]
@@ -315,6 +321,12 @@ data "aws_subnet" "infrashared" {
     name   = "tag:Name"
     values = [ "${var.brand}-infrashared-subnet" ]
   }
+}
+
+resource "aws_cloudwatch_log_group" "github_action_runner" {
+  name = var.cloudwatch_log_group
+  retention_in_days = 30
+  tags = local.tags
 }
 
 resource "aws_key_pair" "ssh_access_key" {

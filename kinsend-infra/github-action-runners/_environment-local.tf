@@ -21,6 +21,10 @@ variable "module_name" {
   default     = "base-infra"
 }
 
+variable "cloudwatch_log_group" {
+  default = "kinsend-github-runners"
+}
+
 data "template_file" "user_data_linux" {
   template = file("${path.module}/templates/linux/start-docker-containers.sh.tpl")
 
@@ -31,6 +35,7 @@ data "template_file" "user_data_linux" {
     runner_image_version     = var.runner_image_version
     runner_image_dev         = var.runner_image_dev
     runner_image_version_dev = var.runner_image_version_dev
+    cloudwatch_log_group     = var.cloudwatch_log_group
   }
 }
 

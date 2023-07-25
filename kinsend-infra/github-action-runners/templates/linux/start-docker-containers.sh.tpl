@@ -45,6 +45,10 @@ for i in $(seq 1 $agents); do
     -e ORG_NAME="kinsend" \
     -e LABELS="ks-linux" \
     -v /var/run/docker.sock:/var/run/docker.sock \
+    --log-driver=awslogs \
+    --log-opt awslogs-region=$AWS_REGION \
+    --log-opt awslogs-group=${cloudwatch_log_group} \
+    --log-opt awslogs-create-group=true \
     ${runner_image}:${runner_image_version}
 
 done
