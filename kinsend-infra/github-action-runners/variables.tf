@@ -11,13 +11,13 @@ variable "runner_image_dev" {
 }
 
 variable "runner_image_version" {
-  default     = "1.0.2"
+  default     = "1.0.3"
   type        = string
   description = "runner image version"
 }
 
 variable "runner_image_version_dev" {
-  default     = "1.0.2"
+  default     = "1.0.3"
   type        = string
   description = "runner image version"
 }
