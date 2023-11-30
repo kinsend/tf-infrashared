@@ -33,8 +33,6 @@ data "template_file" "user_data_linux" {
     brand                    = var.brand
     runner_image             = var.runner_image
     runner_image_version     = var.runner_image_version
-    runner_image_dev         = var.runner_image_dev
-    runner_image_version_dev = var.runner_image_version_dev
     cloudwatch_log_group     = var.cloudwatch_log_group
   }
 }

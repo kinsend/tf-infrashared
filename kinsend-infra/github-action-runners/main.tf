@@ -377,21 +377,22 @@ module "runners_linux" {
   ]
 
   schedules = {
-    earlymorning = {
-      desired_capacity = 1
-      min_size         = 1
-      max_size         = 1
-      recurrence       = "0 3 * * 1-7" # 3am Mon-Sun when little use
-      time_zone        = "Europe/London"
-    }
-
-    morning = {
-      desired_capacity = 1
-      min_size         = 1
-      max_size         = 3
-      recurrence       = "0 7 * * 1-7" # Mon-Sun in the morn, back to normal
-      time_zone        = "Europe/London"
-    }
+# Temporarily removing autoscaling schedules.
+#    earlymorning = {
+#      desired_capacity = 1
+#      min_size         = 1
+#      max_size         = 1
+#      recurrence       = "0 3 * * 1-7" # 3am Mon-Sun when little use
+#      time_zone        = "Europe/London"
+#    }
+#
+#    morning = {
+#      desired_capacity = 1
+#      min_size         = 1
+#      max_size         = 3
+#      recurrence       = "0 7 * * 1-7" # Mon-Sun in the morn, back to normal
+#      time_zone        = "Europe/London"
+#    }
   }
 
   scaling_policies = {
