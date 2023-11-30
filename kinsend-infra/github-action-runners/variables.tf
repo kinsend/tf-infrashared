@@ -4,20 +4,8 @@ variable "runner_image" {
   description = "runner image location"
 }
 
-variable "runner_image_dev" {
-  default     = "202337591493.dkr.ecr.us-east-1.amazonaws.com/github-action-runners"
-  type        = string
-  description = "runner image location"
-}
-
 variable "runner_image_version" {
-  default     = "1.0.4"
-  type        = string
-  description = "runner image version"
-}
-
-variable "runner_image_version_dev" {
-  default     = "1.0.4"
+  default     = "1.0.5"
   type        = string
   description = "runner image version"
 }
